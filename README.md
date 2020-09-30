@@ -97,7 +97,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    - Type `chmod +x requirements.sh`
    - Type `./requirements.sh` 
 
-## Driving the Servo
+## Steering
 1. Open the Arduino IDE on the host computer
 
 2. Configure the correct board and port on the IDE
