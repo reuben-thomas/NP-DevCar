@@ -106,7 +106,9 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 
 4. Assemble the Arduino Nano Every
 
-5. Run `roscore` on the Jetson TX2
+5. Run ROS on the Jetson TX2
+   - Start your terminal
+   - Type `roscore`
 
 6. Run the rosserial script
    - Type `rosrun rosserial_python serial_node.py /dev/<serial_port>`
