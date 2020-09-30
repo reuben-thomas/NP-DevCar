@@ -69,17 +69,17 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    - Type `./flash.sh orbitty mmcblk0p1`
    
 10. Connect the Jetson TX2 system to the same network as your host machine and determine the local IP address of the Jetson TX2
-   - Type `ifconfig` on the Jetson TX2
+    - Type `ifconfig` on the Jetson TX2
    
 11. Re-launch the JetPack installer on the host computer
-   - Type `cd ../..`
-   - Type `./JetPack-L4T-3.3-linux-x64_b39.run`
+    - Type `cd ../..`
+    - Type `./JetPack-L4T-3.3-linux-x64_b39.run`
    
 12. Select the Jetson TX2
 
 13. Install the default Jetson TX2 dependencies that have been overwritten by the BSP
-   - Select "Clear Actions"
-   - Change the entry under "Install on Target" to "install" by double clicking on "no action"
+    - Select "Clear Actions"
+    - Change the entry under "Install on Target" to "install" by double clicking on "no action"
    
 14. Enter the IP address of your Jetson TX2 system, as well as the username and password
 
