@@ -12,7 +12,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 ### Operating System
 1. [Ubuntu 16.04.6 LTS (Xenial Xerus)](http://releases.ubuntu.com/16.04/)
 
-2. [JetpPack 3.3](https://developer.nvidia.com/embedded/jetpack-3_3)
+2. [JetPack 3.3](https://developer.nvidia.com/embedded/jetpack-3_3)
 
 3. [Orbitty L4T R28.2X BSP](https://connecttech.com/ftp/Drivers/CTI-L4T-V121.tgz)
 
