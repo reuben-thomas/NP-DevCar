@@ -26,12 +26,16 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    
 3. [Git](https://git-scm.com/download/linux)
 
+4. [Arduino IDE](https://www.arduino.cc/download_handler.php)
+
 ## Installation on Host Computer
 1. Install [Ubuntu 16.04.6 LTS (Xenial Xerus)](http://releases.ubuntu.com/16.04/)
 
 2. Install [JetPack 3.3](https://developer.nvidia.com/embedded/jetpack-3_3)
 
 3. Install [Orbitty L4T R28.2X BSP](https://connecttech.com/ftp/Drivers/CTI-L4T-V121.tgz)
+
+4. Install [Arduino IDE](https://www.arduino.cc/download_handler.php)
 
 ## Flashing the Jetson TX2
 1. Connect your host computer to the Jetson TX2 via Micro-USB
@@ -88,6 +92,24 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    - Open your terminal
    - Go to the directory you wish to clone the repository in
    - Type `https://github.com/reuben-thomas/NP-DevCar.git`
+   
+3. Install the required packages
+   - Type `chmod +x requirements.sh`
+   - Type `./requirements.sh` 
 
-## Usage
-`rosrun rosserial_python serial_node.py /dev/ttyACM0`
+## Driving the Servo
+1. Open the Arduino IDE on the host computer
+
+2. Configure the correct board and port on the IDE
+
+3. Flash the scripts/Ardu.ino file into the Arduino Nano Every
+
+4. Assemble the Arduino Nano Every
+
+5. Run `roscore` on the Jetson TX2
+
+6. Run the rosserial script
+   - Type `rosrun rosserial_python serial_node.py /dev/<serial_port>`
+   
+7. Test the servo
+   - Type `rostopic pub -r 10 car/cmd_vel geometry_msgs/Twist '{angular: {x: 0.0, y: 0.0, z: <angle>}}'
