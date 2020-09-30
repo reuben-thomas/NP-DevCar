@@ -18,14 +18,13 @@ ros::NodeHandle nh;
 Servo servo;
 Servo motor; 
 
-void steering( const geometry_msgs::Twist& cmd_msg)
+void steering(const geometry_msgs::Twist& cmd_msg)
 {
-  
   int throttle = int(cmd_msg.linear.x);
   int angle = int(cmd_msg.angular.z);
   
   motor.writeMicroseconds(throttle); // Speed (1480: 2m/s, 1450: 0.5m/s, 1500: stop)
-  servo.write(angle); // Set servo angle (0 - 180)
+  servo.write(angle); // Set servo angle (0 - 180 degrees)
 
   digitalWrite(13, HIGH-digitalRead(13));  // Toggle LED  
 }
@@ -40,8 +39,8 @@ void setup()
   nh.initNode();
   nh.subscribe(sub);
 
-  motor.attach(3); // Attach it to pin 3
-  servo.attach(9); // Attach it to pin 9
+  motor.attach(3); // Attach motor PWM to pin 3
+  servo.attach(9); // Attach servo PWM to pin 9
 }
 
 void loop()
