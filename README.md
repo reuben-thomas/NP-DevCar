@@ -68,7 +68,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    - Type `ifconfig` on the Jetson TX2
    
 11. Re-launch the JetPack installer on the host computer
-   - Type `cd ../..
+   - Type `cd ../..`
    - Type `./JetPack-L4T-3.3-linux-x64_b39.run`
    
 12. Select the Jetson TX2
@@ -83,6 +83,11 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 1. Install [Desktop-Full ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu)
    - Type `chmod +x ros-kinetic-desktop-full-install.sh`
    - Type `./ros-kinetic-desktop-full-install.sh` to install Desktop-Full ROS Kinetic
+   
+2. Git clone this repository
+   - Open your terminal
+   - Go to the directory you wish to clone the repository in
+   - Type `https://github.com/reuben-thomas/NP-DevCar.git`
 
 ## Usage
 `rosrun rosserial_python serial_node.py /dev/ttyACM0`
