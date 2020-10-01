@@ -114,4 +114,4 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    - Type `rosrun rosserial_python serial_node.py /dev/<serial_port>`
    
 7. Test the servo
-   - Type `rostopic pub -r 10 car/cmd_vel geometry_msgs/Twist '{angular: {x: 0.0, y: 0.0, z: <angle>}}'`
+   - Type `rostopic pub -r 10 car/cmd_vel geometry_msgs/Twist '{linear: {x: <value>}, angular: {z: <angle>}}'`
