@@ -1,6 +1,17 @@
 # ELECTRIC POWERED 1/10 AUTONOMOUS CAR
 This project covers the development of an autonomous electric car at a 1:10 scale. The car will use vision and LiDAR information to follow a track at high-speeds.
 
+## Table of Contents
+- [Requirements](#Requirements)
+  - [Hardware](#Hardware)
+  - [Operating System](#Operating-System)
+  - [Software](#Software)
+- [Installation](#Installation)
+  - [Installation on Host Computer](#Installation-on-Host-Computer)
+  - [Flashing the Jetson TX2](#Flashing-the-Jetson-TX2)
+  - [Installation on Jetson TX2](#Installation-on-Jetson-TX2)
+-[Testing Steering and Throttle](#Testing-Steering-and-Throttle)
+
 ## Requirements
 ### Hardware
 1. Electric Powered 1/10 RC Car
@@ -28,7 +39,8 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 
 4. [Arduino IDE](https://www.arduino.cc/download_handler.php)
 
-## Installation on Host Computer
+## Installation
+### Installation on Host Computer
 1. Install [Ubuntu 16.04.6 LTS (Xenial Xerus)](http://releases.ubuntu.com/16.04/)
 
 2. Install [JetPack 3.3](https://developer.nvidia.com/embedded/jetpack-3_3)
@@ -37,7 +49,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 
 4. Install [Arduino IDE](https://www.arduino.cc/download_handler.php)
 
-## Flashing the Jetson TX2
+### Flashing the Jetson TX2
 1. Connect your host computer to the Jetson TX2 via Micro-USB
 
 2. Go through the full initial JetPack 3.3 installation
@@ -83,7 +95,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    
 14. Enter the IP address of your Jetson TX2 system, as well as the username and password
 
-## Installation on Jetson TX2
+### Installation on Jetson TX2
 1. Install [Desktop-Full ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu)
    - Type `chmod +x ros-kinetic-desktop-full-install.sh`
    - Type `./ros-kinetic-desktop-full-install.sh` to install Desktop-Full ROS Kinetic
