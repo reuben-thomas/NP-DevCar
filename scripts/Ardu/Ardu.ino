@@ -1,53 +1,97 @@
-#if (ARDUINO >= 100)
- #include <Arduino.h>
+#if defined(ARDUINO) && ARDUINO >= 100
+  #include "Arduino.h"
 #else
- #include <WProgram.h>
+  #include <WProgram.h>
 #endif
 
 #include <Servo.h> 
-#include <SoftwareSerial.h>
+#define USB_USBCON
 #include <ros.h>
-
 #include <std_msgs/UInt16.h>
-#include "std_msgs/MultiArrayLayout.h"
-#include "std_msgs/MultiArrayDimension.h"
-#include "std_msgs/Float32MultiArray.h"
-#include "geometry_msgs/Twist.h"
+#include <std_msgs/String.h>
+#include <std_msgs/Int32.h>
+#include <std_msgs/Empty.h>
+#include <geometry_msgs/Twist.h>
 
-ros::NodeHandle nh;
-Servo servo;
-Servo motor; 
+ros::NodeHandle  nodeHandle;
+// These are general bounds for the steering servo and the
+// TRAXXAS Electronic Speed Controller (ESC)
 
-void steering( const geometry_msgs::Twist& cmd_msg)
+const int minSteering = 50;
+const int maxSteering = 140;
+const int minThrottle = 50;
+const int maxThrottle = 140;
+
+Servo steeringServo;
+Servo electronicSpeedController ;  // The ESC on the TRAXXAS works like a Servo
+
+std_msgs::Int32 str_msg;
+ros::Publisher chatter("chatter", &str_msg); 
+
+// Arduino 'map' funtion for floating point
+double fmap (double toMap, double in_min, double in_max, double out_min, double out_max) 
 {
-  
-  int throttle = int(cmd_msg.linear.x)+90;
-  int angle = int(cmd_msg.angular.z)+90;
-  
-  motor.write(throttle);
-  servo.write(angle); // Set servo angle (0 - 180)
-
-  digitalWrite(13, HIGH-digitalRead(13));  // Toggle LED  
+  return (toMap - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-ros::Subscriber<geometry_msgs::Twist> sub("car/cmd_vel", steering);
+void driveCallback ( const geometry_msgs::Twist&  twistMsg )
+{
+  int steeringAngle = fmap(twistMsg.angular.z, -0.4, 0.4, minSteering, maxSteering) ;
+  // The following could be useful for debugging
+  // str_msg.data= steeringAngle ;
+  // chatter.publish(&str_msg);
+  // Check to make sure steeringAngle is within car range
+  if (steeringAngle < minSteering) 
+  { 
+    steeringAngle = minSteering;
+  }
+  if (steeringAngle > maxSteering) 
+  {
+    steeringAngle = maxSteering ;
+  }
+  steeringServo.write(steeringAngle) ;
+  
+  // ESC forward is between 0.5 and 1.0
+  int escCommand = fmap(-twistMsg.linear.x, -1.5, 1.5, minThrottle, maxThrottle) ;
+
+  // Check to make sure throttle command is within bounds
+  if (escCommand < minThrottle) { 
+    escCommand = minThrottle;
+  }
+  if (escCommand > maxThrottle) {
+    escCommand = maxThrottle ;
+  }
+  // The following could be useful for debugging
+  // str_msg.data= escCommand ;
+  // chatter.publish(&str_msg);
+  
+  electronicSpeedController.write(escCommand) ;
+  digitalWrite(13, HIGH-digitalRead(13));  //toggle led  
+}
+
+ros::Subscriber<geometry_msgs::Twist> driveSubscriber("/cmd_vel", &driveCallback) ;
 
 void setup()
 {
-  Serial.begin(57600);
   pinMode(13, OUTPUT);
-
-  nh.initNode();
-  nh.subscribe(sub);
-
-  motor.attach(3); // Attach it to pin 3
-  servo.attach(9); // Attach it to pin 9
-  motor.write(90);
-  servo.write(90); // Set servo angle (0 - 180)
+  Serial.begin(115200) ;
+  nodeHandle.initNode();
+  // This can be useful for debugging purposes
+  nodeHandle.advertise(chatter);
+  // Subscribe to the steering and throttle messages
+  nodeHandle.subscribe(driveSubscriber) ;
+  // Attach the servos to actual pins
+  steeringServo.attach(9); // Steering servo is attached to pin 9
+  electronicSpeedController.attach(10); // ESC is on pin 10
+  // Initialize Steering and ESC setting
+  // Steering centered is 90, throttle at neutral is 90
+  steeringServo.write(90) ;
+  electronicSpeedController.write(90) ;
+  delay(1000) ; 
 }
 
 void loop()
 {
-  nh.spinOnce();
-  delay(0.1);
+  nodeHandle.spinOnce();
+  delay(1);
 }
