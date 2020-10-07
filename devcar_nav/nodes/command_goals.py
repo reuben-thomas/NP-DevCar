@@ -54,7 +54,9 @@ class Planner(object):
 		self.ay.append(msg.pose.position.y)
 
 		self.display_waypoint(msg.pose.position.x,msg.pose.position.y)
-		self.create_display_path()
+		
+		if (self.goals >= 2):
+			self.create_display_path()
 
 	# display way points on the map
 	def display_waypoint(self,x,y):
