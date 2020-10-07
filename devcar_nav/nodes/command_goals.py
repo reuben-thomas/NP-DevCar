@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 
-
-
 import rospy
 import numpy as np
 import tf
 import math
 import geometry_msgs.msg
 
+from devcar_nav.msg import Path2D, State2D
+from nav_msgs.msg import Path, Odometry
 from geometry_msgs.msg import Point, Pose2D, PoseStamped
 from visualization_msgs.msg import Marker
 from utils.cubic_spline_planner import *
-from devcar_nav.msg import Path2D, State2D
-from nav_msgs.msg import Path, Odometry
 
 class Planner(object):
 	
