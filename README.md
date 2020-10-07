@@ -18,10 +18,10 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 ## Requirements
 ### Hardware
 1. Electric Powered 1/10 RC Car
-2. Hokuyo LiDAR UST-10LX
-3. Jetson TX2
-4. Orbitty Carrier
-5. Arduino Nano Every
+2. [Hokuyo UST-10LX](https://www.hokuyo-usa.com/products/lidar-obstacle-detection/ust-10lx)
+3. [NVIDIA® Jetson™ TX2](https://developer.nvidia.com/embedded/jetson-tx2-developer-kit)
+4. [Orbitty Carrier for NVIDIA® Jetson™ TX2/TX2i/TX1](https://connecttech.com/product/orbitty-carrier-for-nvidia-jetson-tx2-tx1/)
+5. [Arduino Nano Every](https://store.arduino.cc/usa/nano-every)
 
 ### Operating System
 1. [Ubuntu 16.04.6 LTS (Xenial Xerus)](http://releases.ubuntu.com/16.04/)
