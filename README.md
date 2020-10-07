@@ -21,7 +21,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 1. Electric Powered 1/10 RC Car
 2. [Hokuyo UST-10LX](https://www.hokuyo-usa.com/products/lidar-obstacle-detection/ust-10lx)
 3. [NVIDIA® Jetson™ TX2](https://developer.nvidia.com/embedded/jetson-tx2-developer-kit)
-4. [Orbitty Carrier for NVIDIA® Jetson™ TX2/TX2i/TX1](https://connecttech.com/product/orbitty-carrier-for-nvidia-jetson-tx2-tx1/)
+4. [Orbitty Carrier for NVIDIA® Jetson™ TX2/TX2i/TX1](https://connecttech.com/product/orbitty-carrier-for-nvidia-jetson-tx2-tx1/) [REDACTED]
 5. [Arduino Nano Every](https://store.arduino.cc/usa/nano-every)
 
 ### Operating System
