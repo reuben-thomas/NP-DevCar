@@ -13,7 +13,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
   - [Installation on Host Computer](#Installation-on-Host-Computer)
   - [Flashing the Jetson TX2](#Flashing-the-Jetson-TX2)
   - [Installation on Jetson TX2](#Installation-on-Jetson-TX2)
-  -[Testing Steering and Throttle](#Testing-Steering-and-Throttle)
+- [Testing Steering and Throttle](#Testing-Steering-and-Throttle)
 
 ## Requirements
 ### Hardware
