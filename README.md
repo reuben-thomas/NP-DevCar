@@ -1,7 +1,7 @@
 # ELECTRIC POWERED 1/10 AUTONOMOUS CAR
 ![DevCar](https://github.com/reuben-thomas/NP-DevCar/blob/master/screenshots/DevCar.png?raw=true)
 
-# Abstract
+## Abstract
 This project covers the development of an autonomous electric car at a 1:10 scale. The car will use vision and LiDAR information to follow a track at high-speeds.
 
 ## Table of Contents
@@ -130,3 +130,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    
 7. Test the servo
    - Type `rostopic pub car/cmd_vel geometry_msgs/Twist '{linear: {x: <value>}, angular: {z: <angle>}}'`
+
+## Credits
+
+Photographer - [Elgin Ng](https://www.instagram.com/elginjh_/)
