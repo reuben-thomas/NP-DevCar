@@ -1,7 +1,7 @@
 # ELECTRIC POWERED 1/10 AUTONOMOUS CAR
 ![DevCar](https://github.com/reuben-thomas/NP-DevCar/blob/master/screenshots/DevCar.png?raw=true)
 
-# Abstract
+## Abstract
 This project covers the development of an autonomous electric car at a 1:10 scale. The car will use vision and LiDAR information to follow a track at high-speeds.
 
 ## Table of Contents
@@ -13,15 +13,15 @@ This project covers the development of an autonomous electric car at a 1:10 scal
   - [Installation on Host Computer](#Installation-on-Host-Computer)
   - [Flashing the Jetson TX2](#Flashing-the-Jetson-TX2)
   - [Installation on Jetson TX2](#Installation-on-Jetson-TX2)
--[Testing Steering and Throttle](#Testing-Steering-and-Throttle)
+- [Testing Steering and Throttle](#Testing-Steering-and-Throttle)
 
 ## Requirements
 ### Hardware
 1. Electric Powered 1/10 RC Car
-2. Hokuyo LiDAR UST-10LX
-3. Jetson TX2
-4. Orbitty Carrier
-5. Arduino Nano Every
+2. [Hokuyo UST-10LX](https://www.hokuyo-usa.com/products/lidar-obstacle-detection/ust-10lx)
+3. [NVIDIA® Jetson™ TX2](https://developer.nvidia.com/embedded/jetson-tx2-developer-kit)
+4. [Orbitty Carrier for NVIDIA® Jetson™ TX2/TX2i/TX1](https://connecttech.com/product/orbitty-carrier-for-nvidia-jetson-tx2-tx1/)
+5. [Arduino Nano Every](https://store.arduino.cc/usa/nano-every)
 
 ### Operating System
 1. [Ubuntu 16.04.6 LTS (Xenial Xerus)](http://releases.ubuntu.com/16.04/)
@@ -130,3 +130,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    
 7. Test the servo
    - Type `rostopic pub car/cmd_vel geometry_msgs/Twist '{linear: {x: <value>}, angular: {z: <angle>}}'`
+
+## Credits
+
+Photographer - [Elgin Ng](https://www.instagram.com/elginjh_/)
