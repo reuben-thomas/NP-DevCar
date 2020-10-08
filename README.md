@@ -23,6 +23,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 3. [NVIDIA® Jetson™ TX2](https://developer.nvidia.com/embedded/jetson-tx2-developer-kit)
 4. [Orbitty Carrier for NVIDIA® Jetson™ TX2/TX2i/TX1](https://connecttech.com/product/orbitty-carrier-for-nvidia-jetson-tx2-tx1/) [REDACTED]
 5. [Arduino Nano Every](https://store.arduino.cc/usa/nano-every)
+6. [Intel® RealSense™ Tracking Camera T265](https://www.intelrealsense.com/tracking-camera-t265/)
 
 ### Operating System
 1. [Ubuntu 16.04.6 LTS (Xenial Xerus)](http://releases.ubuntu.com/16.04/)
