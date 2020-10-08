@@ -1,5 +1,5 @@
 path_tracker:
-    update_frequency: 1.0
+    update_frequency: 10.0
     control_gain: 1.0
     softening_gain: 1.0
     yawrate_gain: 1.0
