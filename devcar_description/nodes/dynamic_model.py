@@ -23,7 +23,7 @@ class NonLinearBicycleModel():
         # Publishes vehicle position to tf
         self.pose_broadcaster = tf.TransformBroadcaster()
 
-        self.rate = 30.0
+        self.rate = 10.0
         self.dt = 0.1
 
         self.x = x
