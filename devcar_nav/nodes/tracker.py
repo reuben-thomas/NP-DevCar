@@ -13,23 +13,21 @@ class PathTracker:
     def __init__(self):
         
         # Initialise publishers
-        self.tracker_pub = rospy.Publisher('/ngeeann_av/ackermann_cmd', AckermannDrive, queue_size=10)
+        self.tracker_pub = rospy.Publisher('/ackermann_cmd', AckermannDrive, queue_size=10)
         self.lateral_ref_pub = rospy.Publisher('/ngeeann_av/lateral_ref', PoseStamped, queue_size=10)
 
         # Initialise subscribers
-        self.localisation_sub = rospy.Subscriber('/ngeeann_av/state2D', State2D, self.vehicle_state_cb)
-        self.path_sub = rospy.Subscriber('/ngeeann_av/path', Path2D, self.path_cb, queue_size=10)
-        self.target_vel_sub = rospy.Subscriber('/ngeeann_av/target_velocity', Float32, self.target_vel_cb, queue_size=10)
+        self.localisation_sub = rospy.Subscriber('/state2D', State2D, self.vehicle_state_cb)
+        self.path_sub = rospy.Subscriber('/path', Path2D, self.path_cb, queue_size=10)
 
         # Load parameters
         try:
-            self.tracker_params = rospy.get_param("/path_tracker")
-            self.frequency = self.tracker_params["update_frequency"]
-            self.k = self.tracker_params["control_gain"]
-            self.ksoft = self.tracker_params["softening_gain"]
-            self.kyaw = self.tracker_params["yawrate_gain"]
-            self.max_steer = self.tracker_params["steering_limits"]
-            self.cg2frontaxle = self.tracker_params["centreofgravity_to_frontaxle"]
+            self.frequency = 10
+            self.k = 1
+            self.ksoft = 1
+            self.kyaw = 0
+            self.max_steer = 35 * np.pi/180
+            self.cg2frontaxle = 0.105
         
         except:
             raise Exception("Missing ROS parameters. Check the configuration file.")
@@ -41,7 +39,7 @@ class PathTracker:
         self.x = None
         self.y = None
         self.yaw = None
-        self.target_vel = 0.0
+        self.target_vel = 0.1
 
         self.points = 1
         self.lock = threading.Lock()
@@ -85,10 +83,6 @@ class PathTracker:
             self.cyaw.append(ptheta) 
         self.lock.release()
 
-    def target_vel_cb(self, msg):
-
-        self.target_vel = msg.data
-
     def target_index_calculator(self):  
 
         ''' Calculates the target index and each corresponding error '''
@@ -108,7 +102,7 @@ class PathTracker:
         self.crosstrack_error = np.dot([dx[target_idx], dy[target_idx]], front_axle_vec)
 
         # Heading error
-        self.heading_error = self.normalise_angle(self.cyaw[target_idx] - self.yaw - self.halfpi)
+        self.heading_error = self.normalise_angle(self.cyaw[target_idx] - self.yaw)
         self.target_idx = target_idx
 
         # Yaw rate discrepancy
