@@ -4,8 +4,17 @@
 <!-- This launch file launches the latest work of NP-DevCar. -->
 
 <launch>
+    <!--
     <include file="$(find devcar_description)/launch/tf.launch"/>
     <include file="$(find realsense2_camera)/launch/rs_t265.launch"/>
+    -->
 
-     <node type="rviz" name="rviz" pkg="rviz" args="-d $(find devcar_description)/launch/default.rviz" />
+    <rosparam file="$(find devcar_nav)/config/navigation_params.yaml"/>
+
+    <node name="dynamic_model" pkg="devcar_description" type="dynamic_model.py"/>
+    <node name="rviz_goals" pkg="devcar_nav" type="command_goals.py"/>
+    <node name="odom_to_state2D" pkg="devcar_nav" type="localisation.py"/>
+    <node name="path_tracker" pkg="devcar_nav" type="tracker.py"/>
+
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find devcar_description)/launch/default.rviz" />
 </launch>

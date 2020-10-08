@@ -128,7 +128,11 @@ def main():
     while not rospy.is_shutdown():
         try:
             r.sleep()
-
+            try:
+                bicycle_model.pub_odom()
+                bicycle_model.pub_tf()
+            except:
+                pass
         except KeyboardInterrupt:
             print("Shutting down ROS node...")
 

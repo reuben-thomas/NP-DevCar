@@ -18,16 +18,17 @@ class PathTracker:
 
         # Initialise subscribers
         self.localisation_sub = rospy.Subscriber('/state2D', State2D, self.vehicle_state_cb)
-        self.path_sub = rospy.Subscriber('/path', Path2D, self.path_cb, queue_size=10)
+        self.path_sub = rospy.Subscriber('/target_path', Path2D, self.path_cb, queue_size=10)
 
         # Load parameters
         try:
-            self.frequency = 10
-            self.k = 1
-            self.ksoft = 1
-            self.kyaw = 0
-            self.max_steer = 35 * np.pi/180
-            self.cg2frontaxle = 0.105
+            self.tracker_params = rospy.get_param("/path_tracker")
+            self.frequency = self.tracker_params["update_frequency"]
+            self.k = self.tracker_params["control_gain"]
+            self.ksoft = self.tracker_params["softening_gain"]
+            self.kyaw = self.tracker_params["yawrate_gain"]
+            self.max_steer = self.tracker_params["steering_limits"]
+            self.cg2frontaxle = self.tracker_params["centreofgravity_to_frontaxle"]
         
         except:
             raise Exception("Missing ROS parameters. Check the configuration file.")
@@ -39,7 +40,7 @@ class PathTracker:
         self.x = None
         self.y = None
         self.yaw = None
-        self.target_vel = 0.1
+        self.target_vel = 1
 
         self.points = 1
         self.lock = threading.Lock()
@@ -200,7 +201,6 @@ class PathTracker:
         
         drive = AckermannDrive()
         drive.speed = velocity
-        drive.acceleration = 1.0
         drive.steering_angle = steering_angle
         drive.steering_angle_velocity = 0.0
         self.tracker_pub.publish(drive)
@@ -220,10 +220,6 @@ def main():
 
     # Set update rate
     r = rospy.Rate(path_tracker.frequency)
-
-    # Wait for messages
-    rospy.wait_for_message('/ngeeann_av/state2D', State2D)
-    rospy.wait_for_message('/ngeeann_av/path', Path2D)
 
     while not rospy.is_shutdown():
         try:
