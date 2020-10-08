@@ -38,4 +38,3 @@ if __name__ == '__main__':
 
         broadcaster.sendTransform(static_transformStamped)
         rospy.spin()
-
