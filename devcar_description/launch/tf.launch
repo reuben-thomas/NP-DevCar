@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<!-- tf.launch -->
+<!-- This launch file launches the transforms of the DevCar. -->
+
+<launch>
+    <node name="tf_01" pkg="devcar_description" type="map_tf.py" args="camera_odom_frame 0 0 0 0 0 0"/>
+    <node name="tf_02" pkg="devcar_description" type="odom_tf.py" args="odom 0 0 0 0 0 0"/>
+    <node name="laser" pkg="devcar_description" type="laser_tf.py" args="laser 0 0 0 0 0 0"/>
+</launch>
+

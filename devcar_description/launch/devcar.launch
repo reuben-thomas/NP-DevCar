@@ -4,6 +4,7 @@
 <!-- This launch file launches the latest work of NP-DevCar. -->
 
 <launch>
+    <include file="$(find realsense2_camera)/launch/rs_t265.launch"/>
 
-
+     <node type="rviz" name="rviz" pkg="rviz" args="-d $(find devcar_description)/launch/default.rviz" />
 </launch>

@@ -1,5 +1,5 @@
 # ELECTRIC POWERED 1/10 AUTONOMOUS CAR
-![DevCar](https://github.com/reuben-thomas/NP-DevCar/blob/master/screenshots/DevCar.png?raw=true)
+![DevCar](https://github.com/reuben-thomas/NP-DevCar/blob/master/screenshots/DevCar-01.jpeg)
 
 ## Abstract
 This project covers the development of an autonomous electric car at a 1:10 scale. The car will use vision and LiDAR information to follow a track at high-speeds.
@@ -14,14 +14,16 @@ This project covers the development of an autonomous electric car at a 1:10 scal
   - [Flashing the Jetson TX2](#Flashing-the-Jetson-TX2)
   - [Installation on Jetson TX2](#Installation-on-Jetson-TX2)
 - [Testing Steering and Throttle](#Testing-Steering-and-Throttle)
+- [Credits](#Credits)
 
 ## Requirements
 ### Hardware
 1. Electric Powered 1/10 RC Car
 2. [Hokuyo UST-10LX](https://www.hokuyo-usa.com/products/lidar-obstacle-detection/ust-10lx)
 3. [NVIDIA® Jetson™ TX2](https://developer.nvidia.com/embedded/jetson-tx2-developer-kit)
-4. [Orbitty Carrier for NVIDIA® Jetson™ TX2/TX2i/TX1](https://connecttech.com/product/orbitty-carrier-for-nvidia-jetson-tx2-tx1/)
+4. [Orbitty Carrier for NVIDIA® Jetson™ TX2/TX2i/TX1](https://connecttech.com/product/orbitty-carrier-for-nvidia-jetson-tx2-tx1/) [REDACTED]
 5. [Arduino Nano Every](https://store.arduino.cc/usa/nano-every)
+6. [Intel® RealSense™ Tracking Camera T265](https://www.intelrealsense.com/tracking-camera-t265/)
 
 ### Operating System
 1. [Ubuntu 16.04.6 LTS (Xenial Xerus)](http://releases.ubuntu.com/16.04/)
@@ -30,24 +32,18 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 
 ### Software
 1. [Desktop-Full ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu)
-
 2. [Python 2.7](https://www.python.org/download/releases/2.7/)
    - [pip](https://pypi.org/project/pip/)
    - [rospy](http://wiki.ros.org/rospy)
    - [NumPy](https://pypi.org/project/numpy/)
-   
 3. [Git](https://git-scm.com/download/linux)
-
 4. [Arduino IDE](https://www.arduino.cc/download_handler.php)
 
 ## Installation
 ### Installation on Host Computer
 1. Install [Ubuntu 16.04.6 LTS (Xenial Xerus)](http://releases.ubuntu.com/16.04/)
-
 2. Install [JetPack 3.3](https://developer.nvidia.com/embedded/jetpack-3_3)
-
 3. Install [Orbitty L4T R28.2X BSP](https://connecttech.com/ftp/Drivers/CTI-L4T-V121.tgz)
-
 4. Install [Arduino IDE](https://www.arduino.cc/download_handler.php)
 
 ### Flashing the Jetson TX2
@@ -74,26 +70,26 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    - Press the reset button
    - Hold the recovery button and press then reset button once
    - Keep holding the recovery button for 2 seconds
-
+   
 8. Change to the Linux_for_Tegra directory
    - Type `cd ..`
-
+   
 9. Flash the Jetson TX2
    - Type `./flash.sh orbitty mmcblk0p1`
    
 10. Connect the Jetson TX2 system to the same network as your host machine and determine the local IP address of the Jetson TX2
     - Type `ifconfig` on the Jetson TX2
-   
+    
 11. Re-launch the JetPack installer on the host computer
     - Type `cd ../..`
     - Type `./JetPack-L4T-3.3-linux-x64_b39.run`
-   
+    
 12. Select the Jetson TX2
 
 13. Install the default Jetson TX2 dependencies that have been overwritten by the BSP
     - Select "Clear Actions"
     - Change the entry under "Install on Target" to "install" by double clicking on "no action"
-   
+    
 14. Enter the IP address of your Jetson TX2 system, as well as the username and password
 
 ### Installation on Jetson TX2
@@ -108,8 +104,8 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    
 3. Install the required packages
    - Type `chmod +x requirements.sh`
-   - Type `./requirements.sh` 
-
+   - Type `./requirements.sh`
+   
 ## Testing Steering and Throttle
 1. Open the Arduino IDE on the host computer
 
@@ -122,7 +118,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 5. Run ROS on the Jetson TX2
    - Start your terminal
    - Type `roscore`
-
+   
 6. Run the rosserial script
    - Type `rosrun rosserial_python serial_node.py /dev/<serial_port>`
    
@@ -130,5 +126,4 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    - Type `rostopic pub car/cmd_vel geometry_msgs/Twist '{linear: {x: <value>}, angular: {z: <angle>}}'`
 
 ## Credits
-
 Photographer - [Elgin Ng](https://www.instagram.com/elginjh_/)
