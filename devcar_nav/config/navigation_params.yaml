@@ -3,5 +3,3 @@ path_tracker:
     control_gain: 1.0
     softening_gain: 1.0
     yawrate_gain: 1.0
-    steering_limits: 0.610865
-    centreofgravity_to_frontaxle: 0.105

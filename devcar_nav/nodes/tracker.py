@@ -22,13 +22,15 @@ class PathTracker:
 
         # Load parameters
         try:
+            self.model_params = rospy.get_param("/vehicle_model")
+            self.max_steer = self.model_params["steering_limits"]
+            self.cg2frontaxle = self.model_params["centreofgravity_to_frontaxle"]
+
             self.tracker_params = rospy.get_param("/path_tracker")
             self.frequency = self.tracker_params["update_frequency"]
             self.k = self.tracker_params["control_gain"]
             self.ksoft = self.tracker_params["softening_gain"]
             self.kyaw = self.tracker_params["yawrate_gain"]
-            self.max_steer = self.tracker_params["steering_limits"]
-            self.cg2frontaxle = self.tracker_params["centreofgravity_to_frontaxle"]
         
         except:
             raise Exception("Missing ROS parameters. Check the configuration file.")
@@ -60,7 +62,7 @@ class PathTracker:
         self.x = msg.pose.x
         self.y = msg.pose.y
         self.yaw = msg.pose.theta
-        self.vel = np.sqrt((msg.twist.x**2.0) + (msg.twist.y**2.0))
+        self.current_vel = np.sqrt((msg.twist.x**2.0) + (msg.twist.y**2.0))
         self.yawrate = msg.twist.w
 
         if self.cyaw:
@@ -156,7 +158,7 @@ class PathTracker:
                 delta_theta += self.cyaw[n + 1] - self.cyaw[n]
 
             # Angular velocity calculation
-            w = -(delta_theta / delta_s) * self.vel
+            w = -(delta_theta / delta_s) * self.current_vel
 
         return w
 
@@ -167,7 +169,7 @@ class PathTracker:
         crosstrack_term = np.arctan2((self.k * self.crosstrack_error), (self.ksoft + self.target_vel))
         heading_term = self.normalise_angle(self.heading_error)
         yawrate_term = 0.0
-        #yawrate_term = -self.kyaw * self.yawrate_error
+        # yawrate_term = -self.kyaw * self.yawrate_error
         
         sigma_t = crosstrack_term + heading_term + yawrate_term
 

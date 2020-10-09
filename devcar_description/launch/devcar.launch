@@ -10,6 +10,7 @@
     -->
 
     <rosparam file="$(find devcar_nav)/config/navigation_params.yaml"/>
+    <rosparam file="$(find devcar_description)/config/model_params.yaml"/>
 
     <node name="dynamic_model" pkg="devcar_description" type="dynamic_model.py"/>
     <node name="rviz_goals" pkg="devcar_nav" type="command_goals.py"/>
