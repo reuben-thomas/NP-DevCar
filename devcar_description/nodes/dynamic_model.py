@@ -10,7 +10,7 @@ from ackermann_msgs.msg import AckermannDrive
 # non-linear lateral bicycle model
 class NonLinearBicycleModel():
 
-    def __init__(self, x=0.0, y=0.0, yaw=0.0, vx=0.00000001, vy=0.0, omega=0.0):
+    def __init__(self, x=0.0, y=0.0, yaw=0.0, vx=0.000001, vy=0.0, omega=0.0):
         
         rospy.init_node('dynamic_model')
 
@@ -33,7 +33,7 @@ class NonLinearBicycleModel():
         self.vy = vy
         self.omega = omega
 
-        self.max_steer = np.radians(35.0)  # [rad] max steering angle
+        self.max_steer = 0.7  # [rad] max steering angle
         self.L = 0.210  # [m] Wheel base of vehicle
         self.Lr = self.L / 2.0  # [m]
         self.Lf = self.L - self.Lr
@@ -51,25 +51,32 @@ class NonLinearBicycleModel():
         self.c_a = 1.36
         self.c_r1 = 0.01
 
-    def cmd_cb(self, msg):
-        self.update(msg.speed, msg.steering_angle)
-        self.pub_odom()
-        self.pub_tf()
+        self.throttle = 0.0
+        self.delta = 0.0
 
-    def update(self, throttle, delta):
-        delta = np.clip(delta, -self.max_steer, self.max_steer)
+
+    def cmd_cb(self, msg):
+        self.throttle = msg.speed
+        self.delta = msg.steering_angle
+
+    def update(self):
+        self.delta = np.clip(self.delta, -self.max_steer, self.max_steer)
         self.x = self.x + self.vx * math.cos(self.yaw) * self.dt - self.vy * math.sin(self.yaw) * self.dt
         self.y = self.y + self.vx * math.sin(self.yaw) * self.dt + self.vy * math.cos(self.yaw) * self.dt
         self.yaw = self.yaw + self.omega * self.dt
         self.yaw = self.normalize_angle(self.yaw)
-        Ffy = -self.Cf * math.atan2(((self.vy + self.Lf * self.omega) / self.vx - delta), 1.0)
-        Fry = -self.Cr * math.atan2((self.vy - self.Lr * self.omega) / self.vx, 1.0)
+        
+        af = math.atan2(((self.vy + self.Lf * self.omega) / self.vx - self.delta), 1.0)
+        ar = math.atan2((self.vy - self.Lr * self.omega) / self.vx, 1.0)
+
+        Ffy = -self.Cf * af
+        Fry = -self.Cr * ar
         R_x = self.c_r1 * self.vx
         F_aero = self.c_a * self.vx ** 2
         F_load = F_aero + R_x
-        self.vx = self.vx + (throttle - Ffy * math.sin(delta) / self.m - F_load/self.m + self.vy * self.omega) * self.dt
-        self.vy = self.vy + (Fry / self.m + Ffy * math.cos(delta) / self.m - self.vx * self.omega) * self.dt
-        self.omega = self.omega + (Ffy * self.Lf * math.cos(delta) - Fry * self.Lr) / self.Iz * self.dt
+        self.vx = self.vx + (self.throttle - Ffy * math.sin(self.delta) / self.m - F_load/self.m + self.vy * self.omega) * self.dt
+        self.vy = self.vy + (Fry / self.m + Ffy * math.cos(self.delta) / self.m - self.vx * self.omega) * self.dt
+        self.omega = self.omega + (Ffy * self.Lf * math.cos(self.delta) - Fry * self.Lr) / self.Iz * self.dt
 
     def pub_odom(self):
         odom = Odometry()
@@ -129,6 +136,7 @@ def main():
         try:
             r.sleep()
             try:
+                bicycle_model.update()
                 bicycle_model.pub_odom()
                 bicycle_model.pub_tf()
             except:
