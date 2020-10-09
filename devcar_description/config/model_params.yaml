@@ -1,6 +1,6 @@
 vehicle_model:
     centreofgravity_to_frontaxle: 0.105
-    steering_limits: 0.610865
+    steering_limits: 0.7
     wheelbase: 0.210
     mass: 3.0
     moment_of_inertia_z: 0.3
