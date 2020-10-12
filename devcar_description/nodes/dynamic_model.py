@@ -79,6 +79,7 @@ class NonLinearBicycleModel():
         Ffy = -Cf * af
         Fry = -Cr * ar
 
+        # Calculate the total frictional force
         R_x = self.c_k * self.vx
         F_aero = self.c_d * self.vx ** 2
         F_load = F_aero + R_x
