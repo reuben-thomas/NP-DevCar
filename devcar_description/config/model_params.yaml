@@ -4,8 +4,8 @@ vehicle_model:
     wheelbase: 0.210
     mass: 3.0
     moment_of_inertia_z: 0.3
-    drag_coefficient: 1.36
-    coefficient_of_kinetic_friction: 0.01
+    aerodynamic_coefficient: 2.0
+    coefficient_of_resistance: 0.01
 
 dynamic_model:
     update_frequency: 10.0

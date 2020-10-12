@@ -28,8 +28,8 @@ class NonLinearBicycleModel():
             self.Lf = self.model_params["centreofgravity_to_frontaxle"]
             self.m = self.model_params["mass"]
             self.Iz = self.model_params["moment_of_inertia_z"]
-            self.c_d = self.model_params["drag_coefficient"]
-            self.c_k = self.model_params["coefficient_of_kinetic_friction"]
+            self.c_a = self.model_params["aerodynamic_coefficient"]
+            self.c_r = self.model_params["coefficient_of_resistance"]
 
             self.dynamic_params = rospy.get_param("/dynamic_model")
             self.frequency = self.dynamic_params["update_frequency"]
@@ -46,11 +46,14 @@ class NonLinearBicycleModel():
         self.vy = vy
         self.omega = omega
 
+        self.x_dot = 0.0
+        self.y_dot = 0.0
+
         self.throttle = 0.0
         self.delta = 0.0
 
         self.dt = 1 / self.frequency
-        self.Lr = self.L - self.Lf        
+        self.Lr = self.L - self.Lf   
 
     def cmd_cb(self, msg):
 
@@ -61,23 +64,27 @@ class NonLinearBicycleModel():
 
         rospy.loginfo("Computing with the kinematic bicycle model")
 
-        # Compute the state change rate
-        self.vx += self.throttle * self.dt
-        self.delta = np.clip(self.delta, -self.max_steer, self.max_steer)
-        x_dot = self.vx * np.cos(self.yaw)
-        y_dot = self.vx * np.sin(self.yaw)
-
-        # Compute the final state using the discrete time model
-        self.x += x_dot * self.dt
-        self.y += y_dot * self.dt
+        # Compute the local velocity in the x-axis
+        f_load = self.vx * (self.c_r + self.c_a * self.vx)
+        self.vx += self.dt * (self.throttle - f_load)
 
         # Compute radius and angular velocity of the kinematic bicycle model
+        self.delta = np.clip(self.delta, -self.max_steer, self.max_steer)
+
         if self.delta == 0.0:
             self.omega = 0.0
+
         else:
             R = self.L / np.tan(self.delta)
             self.omega = self.vx / R
-        
+
+        # Compute the state change rate
+        self.x_dot = self.vx * np.cos(self.yaw)
+        self.y_dot = self.vx * np.sin(self.yaw)
+
+        # Compute the final state using the discrete time model
+        self.x += self.x_dot * self.dt
+        self.y += self.y_dot * self.dt
         self.yaw += self.omega * self.dt
         self.yaw = self.normalise_angle(self.yaw)
 
@@ -105,16 +112,27 @@ class NonLinearBicycleModel():
         Ffy = -Cf * af
         Fry = -Cr * ar
 
-        # Calculate the total frictional force
-        R_x = self.c_k * self.vx
-        F_aero = self.c_d * self.vx ** 2
-        F_load = F_aero + R_x
+        f_load = self.vx * (self.c_r + self.c_a * self.vx)
 
         # Calculate the velocity components and angular velocity
         try:
-            self.vx = self.vx + (self.throttle - Ffy * np.sin(self.delta) / self.m - F_load / self.m + self.vy * self.omega) * self.dt
+            self.vx = self.vx + (self.throttle - Ffy * np.sin(self.delta) / self.m - f_load / self.m + self.vy * self.omega) * self.dt
             self.vy = self.vy + (Fry / self.m + Ffy * np.cos(self.delta) / self.m - self.vx * self.omega) * self.dt
             self.omega = self.omega + (Ffy * self.Lf * np.cos(self.delta) - Fry * self.Lr) / self.Iz * self.dt
+
+            # Creates rotation matrix given theta
+            c = np.cos(self.yaw)
+            s = np.sin(self.yaw)
+            R = np.array(((c, -s), (s, c)))  
+
+            # Vector of point in vehicle frame
+            vp = np.array(((self.vx), (self.vy)))
+
+            # rotation to allign with global frame
+            rotate = R.dot(vp)
+
+            self.x_dot = vp[0]
+            self.y_dot = vp[1]
 
         except:
             raise Exception("Mass of the vehicle cannot be zero. Vehicle must exist physically.")
@@ -135,8 +153,8 @@ class NonLinearBicycleModel():
         odom.pose.pose.orientation.w = quaternion[3]
 
         # Creating twist message
-        odom.twist.twist.linear.x = self.vx
-        odom.twist.twist.linear.y = self.vy
+        odom.twist.twist.linear.x = self.x_dot
+        odom.twist.twist.linear.y = self.y_dot
         odom.twist.twist.linear.z = 0.0
         odom.twist.twist.angular.x = 0.0
         odom.twist.twist.angular.y = 0.0
@@ -144,7 +162,8 @@ class NonLinearBicycleModel():
 
         # Odometry header and publish
         odom.header.stamp = rospy.Time.now()
-        odom.header.frame_id = "camera_link"
+        odom.header.frame_id = "map"
+        odom.child_frame_id = "camera_link"
         self.odom_pub.publish(odom)
 
     def pub_tf(self):
