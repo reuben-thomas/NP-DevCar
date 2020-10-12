@@ -8,5 +8,5 @@ vehicle_model:
     coefficient_of_kinetic_friction: 0.01
 
 dynamic_model:
-    frequency: 10.0
+    update_frequency: 10.0
     velocity_threshold: 0.01
