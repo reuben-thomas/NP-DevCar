@@ -31,8 +31,9 @@ class NonLinearBicycleModel():
             self.c_d = self.model_params["drag_coefficient"]
             self.c_k = self.model_params["coefficient_of_kinetic_friction"]
 
-            self.tracker_params = rospy.get_param("/path_tracker")
-            self.frequency = self.tracker_params["update_frequency"]
+            self.dynamic_params = rospy.get_param("/dynamic_model")
+            self.frequency = self.dynamic_params["update_frequency"]
+            self.vel_thresh = self.dynamic_params["velocity_threshold"]
         
         except:
             raise Exception("Missing ROS parameters. Check the configuration file.")
@@ -50,7 +51,6 @@ class NonLinearBicycleModel():
 
         self.dt = 1 / self.frequency
         self.Lr = self.L - self.Lf        
-        self.vel_thresh = 100.0
 
     def cmd_cb(self, msg):
 

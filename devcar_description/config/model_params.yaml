@@ -6,3 +6,7 @@ vehicle_model:
     moment_of_inertia_z: 0.3
     drag_coefficient: 1.36
     coefficient_of_kinetic_friction: 0.01
+
+dynamic_model:
+    frequency: 10.0
+    velocity_threshold: 0.01
