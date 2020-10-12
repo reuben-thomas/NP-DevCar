@@ -28,8 +28,8 @@ class NonLinearBicycleModel():
             self.Lf = self.model_params["centreofgravity_to_frontaxle"]
             self.m = self.model_params["mass"]
             self.Iz = self.model_params["moment_of_inertia_z"]
-            self.c_a = self.model_params["drag_coefficient"]
-            self.c_r1 = self.model_params["coefficient_of_kinetic_friction"]
+            self.c_d = self.model_params["drag_coefficient"]
+            self.c_k = self.model_params["coefficient_of_kinetic_friction"]
 
             self.tracker_params = rospy.get_param("/path_tracker")
             self.frequency = self.tracker_params["update_frequency"]
@@ -71,16 +71,19 @@ class NonLinearBicycleModel():
         self.yaw = self.yaw + self.omega * dt
         self.yaw = self.normalise_angle(self.yaw)
         
-        af = np.arctan2(self.vy + self.Lf * self.omega / self.vx - self.delta, 1.0)
-        ar = np.arctan2(self.vy - Lr * self.omega / self.vx, 1.0)
+        # Calculate front and rear slip angles
+        af = np.arctan2((self.vy + self.Lf * self.omega / self.vx) - (self.delta), 1.0)
+        ar = np.arctan2((self.vy - Lr * self.omega / self.vx), 1.0)
 
+        # Calculate front and rear lateral forces
         Ffy = -Cf * af
         Fry = -Cr * ar
 
-        R_x = self.c_r1 * self.vx
-        F_aero = self.c_a * self.vx ** 2
+        R_x = self.c_k * self.vx
+        F_aero = self.c_d * self.vx ** 2
         F_load = F_aero + R_x
 
+        # Calculate the velocity components and angular velocity
         self.vx = self.vx + (self.throttle - Ffy * np.sin(self.delta) / self.m - F_load/self.m + self.vy * self.omega) * dt
         self.vy = self.vy + (Fry / self.m + Ffy * np.cos(self.delta) / self.m - self.vx * self.omega) * dt
         self.omega = self.omega + (Ffy * self.Lf * np.cos(self.delta) - Fry * Lr) / self.Iz * dt
