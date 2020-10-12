@@ -40,13 +40,12 @@ class Planner(object):
 
 		self.frame_id = "map"
 
-		self.ds = 0.1
+		self.ds = 0.025
 
 
 	# fetch clicked way points
 	def clicked_goals_cb(self, msg):
 		self.goals += 1
-
 		# Adding to master 2D waypoint list
 		self.ax.append(msg.pose.position.x)
 		self.ay.append(msg.pose.position.y)

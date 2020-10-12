@@ -103,14 +103,17 @@ class PathTracker:
         # Cross track error, project RMS error onto the front axle vector
         front_axle_vec = [-np.cos(self.yaw + self.halfpi), -np.sin(self.yaw + self.halfpi)]
         self.crosstrack_error = np.dot([dx[target_idx], dy[target_idx]], front_axle_vec)
+        print('Crosstrack Error : {}'.format(self.crosstrack_error))
 
         # Heading error
         self.heading_error = self.normalise_angle(self.cyaw[target_idx] - self.yaw)
         self.target_idx = target_idx
+        print('Heading Error    : {}'.format(self.heading_error))
 
         # Yaw rate discrepancy
         try:
             self.yawrate_error = self.trajectory_yawrate_calc() - self.yawrate
+            print('Yaw Rate Error   : {}'.format(self.yawrate_error))
 
         except:
             self.yawrate_error = 0.0
@@ -241,6 +244,7 @@ def main():
 
         except KeyboardInterrupt:
             print("\n\nExecution time     : {}".format(datetime.datetime.now() - begin_time))
+            path_tracker.set_vehicle_command(0.0, 0.0)
             print("Average track error  : {}".format(sum(track_error) / len(track_error)))
             print("Shutting down ROS node...")
 
