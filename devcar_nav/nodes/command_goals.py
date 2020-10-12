@@ -29,13 +29,13 @@ class Planner:
 		# rospy.Subscriber("/camera/odom/sample", Odometry, self.pose_cb)		
 
 		# Load parameters
-        try:
-            self.planner_params = rospy.get_param("/vehicle_model")
-            self.ds = self.planner_params("distance_step")
-			self.frame_id = self.planner_params("frame_id")
-
-        except:
-            raise Exception("Missing ROS parameters. Check the configuration file.")
+		try:
+			self.planner_params = rospy.get_param("/path_planner")
+			self.ds = self.planner_params["distance_step"]
+			self.frame_id = self.planner_params["frame_id"]
+		
+		except:
+			raise Exception("Missing ROS parameters. Check the configuration file.")
 
 		# Total Goals
 		self.ax = []
@@ -128,8 +128,8 @@ def main():
 
     # Initialise the class
     planner = Planner()
-
-	print("*********** waypoint.py: read and display way point on the map ***********")
+    
+    print("*********** waypoint.py: read and display way point on the map ***********")
 
     while not rospy.is_shutdown():
         try:

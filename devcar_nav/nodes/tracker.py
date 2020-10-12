@@ -42,7 +42,7 @@ class PathTracker:
         self.x = None
         self.y = None
         self.yaw = None
-        self.target_vel = 0.1
+        self.target_vel = 0.01
 
         self.points = 1
         self.lock = threading.Lock()

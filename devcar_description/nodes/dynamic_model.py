@@ -48,75 +48,76 @@ class NonLinearBicycleModel():
         self.throttle = 0.0
         self.delta = 0.0
 
+        self.dt = 1 / self.frequency
+        self.Lr = self.L - self.Lf        
+        self.vel_thresh = 100.0
+
     def cmd_cb(self, msg):
 
         self.throttle = msg.speed
         self.delta = msg.steering_angle
 
-    def update(self):
+    def linear_model(self):
 
-        dt = 1 / self.frequency
-        Lr = self.L - self.Lf
+        rospy.loginfo("Computing with the kinematic bicycle model")
 
-        if self.vx < 0.01:
-            rospy.loginfo("Computing with the kinematic bicycle model")
-
-            # Compute radius and angular velocity of the kinematic bicycle model
-            if self.yaw == 0:
-                self. omega = 0
-            
-            else:
-                R = self.L / np.sin(self.yaw)
-                self.vx = self.vx + self.throttle
-                self.omega = self.vx / R
-
-            # Compute the state change rate
-            self.vx = self.vx + self.throttle
-            x_dot = self.vx * np.cos(self.yaw)
-            y_dot = self.vx * np.sin(self.yaw)
-
-            # Compute the final state using the discrete time model
-            self.x = self.x + x_dot * dt
-            self.y = self.y + y_dot * dt
-            self.yaw = self.yaw + self.delta + self.omega * dt
-            self.yaw = self.normalise_angle(self.yaw)
-
+        # Compute radius and angular velocity of the kinematic bicycle model
+        if self.yaw == 0.0:
+            self.omega = 0.0
+        
         else:
-            rospy.loginfo("Computing with the dynamic bicycle model")
-            '''
-            Cornering stiffness estimated calculation [N/rad]
-            Reference: https://www.mchenrysoftware.com/medit32/readme/msmac/default.htm?turl=examplestirecorneringstiffnesscalculation1.htm
-            '''
-            Cf = self.m * (Lr / self.L) * 0.5 * 0.165 * (180 / np.pi)
-            Cr = self.m * (self.Lf / self.L) * 0.5 * 0.165 * (180 / np.pi)
+            R = self.L / np.tan(self.delta)
+            self.omega = self.vx / R
 
-            self.delta = np.clip(self.delta, -self.max_steer, self.max_steer)
-            self.x = self.x + self.vx * np.cos(self.yaw) * dt - self.vy * np.sin(self.yaw) * dt
-            self.y = self.y + self.vx * np.sin(self.yaw) * dt + self.vy * np.cos(self.yaw) * dt
-            self.yaw = self.yaw + self.omega * dt
-            self.yaw = self.normalise_angle(self.yaw)
-            
-            # Calculate front and rear slip angles
-            af = np.arctan2((self.vy + self.Lf * self.omega / self.vx) - (self.delta), 1.0)
-            ar = np.arctan2((self.vy - Lr * self.omega / self.vx), 1.0)
+        # Compute the state change rate
+        self.vx += self.throttle
+        self.delta = np.clip(self.delta, -self.max_steer, self.max_steer)
+        x_dot = self.vx * np.cos(self.yaw)
+        y_dot = self.vx * np.sin(self.yaw)
 
-            # Calculate front and rear lateral forces
-            Ffy = -Cf * af
-            Fry = -Cr * ar
+        # Compute the final state using the discrete time model
+        self.x += x_dot * self.dt
+        self.y += y_dot * self.dt
+        self.yaw += self.omega * self.dt
+        self.yaw = self.normalise_angle(self.yaw)
 
-            # Calculate the total frictional force
-            R_x = self.c_k * self.vx
-            F_aero = self.c_d * self.vx ** 2
-            F_load = F_aero + R_x
+    def nonlinear_model(self):
 
-            # Calculate the velocity components and angular velocity
-            try:
-                self.vx = self.vx + (self.throttle - Ffy * np.sin(self.delta) / self.m - F_load / self.m + self.vy * self.omega) * dt
-                self.vy = self.vy + (Fry / self.m + Ffy * np.cos(self.delta) / self.m - self.vx * self.omega) * dt
-                self.omega = self.omega + (Ffy * self.Lf * np.cos(self.delta) - Fry * Lr) / self.Iz * dt
+        rospy.loginfo("Computing with the dynamic bicycle model")
+        '''
+        Cornering stiffness estimated calculation [N/rad]
+        Reference: https://www.mchenrysoftware.com/medit32/readme/msmac/default.htm?turl=examplestirecorneringstiffnesscalculation1.htm
+        '''
+        Cf = self.m * (self.Lr / self.L) * 0.5 * 0.165 * (180 / np.pi)
+        Cr = self.m * (self.Lf / self.L) * 0.5 * 0.165 * (180 / np.pi)
 
-            except:
-                raise Exception("Mass of the vehicle cannot be zero. Vehicle must exist physically.")
+        self.delta = np.clip(self.delta, -self.max_steer, self.max_steer)
+        self.x = self.x + self.vx * np.cos(self.yaw) * self.dt - self.vy * np.sin(self.yaw) * self.dt
+        self.y = self.y + self.vx * np.sin(self.yaw) * self.dt + self.vy * np.cos(self.yaw) * self.dt
+        self.yaw = self.yaw + self.omega * self.dt
+        self.yaw = self.normalise_angle(self.yaw)
+        
+        # Calculate front and rear slip angles
+        af = np.arctan2((self.vy + self.Lf * self.omega / self.vx) - (self.delta), 1.0)
+        ar = np.arctan2((self.vy - self.Lr * self.omega / self.vx), 1.0)
+
+        # Calculate front and rear lateral forces
+        Ffy = -Cf * af
+        Fry = -Cr * ar
+
+        # Calculate the total frictional force
+        R_x = self.c_k * self.vx
+        F_aero = self.c_d * self.vx ** 2
+        F_load = F_aero + R_x
+
+        # Calculate the velocity components and angular velocity
+        try:
+            self.vx = self.vx + (self.throttle - Ffy * np.sin(self.delta) / self.m - F_load / self.m + self.vy * self.omega) * self.dt
+            self.vy = self.vy + (Fry / self.m + Ffy * np.cos(self.delta) / self.m - self.vx * self.omega) * self.dt
+            self.omega = self.omega + (Ffy * self.Lf * np.cos(self.delta) - Fry * self.Lr) / self.Iz * self.dt
+
+        except:
+            raise Exception("Mass of the vehicle cannot be zero. Vehicle must exist physically.")
 
     def pub_odom(self):
 
@@ -181,7 +182,12 @@ def main():
             r.sleep()
 
             try:
-                bicycle_model.update()
+                if bicycle_model.vx < bicycle_model.vel_thresh:
+                    bicycle_model.linear_model()
+
+                else:
+                    bicycle_model.nonlinear_model()
+                
                 bicycle_model.pub_odom()
                 bicycle_model.pub_tf()
 
