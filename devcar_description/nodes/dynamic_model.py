@@ -4,7 +4,7 @@ import rospy
 import tf
 import numpy as np
 
-from nav_msgs.msg import Path, Odometry
+from nav_msgs.msg import Odometry
 from ackermann_msgs.msg import AckermannDrive
 
 class NonLinearBicycleModel():

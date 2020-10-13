@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import rospy
-import numpy as np
 import tf
-from gazebo_msgs.srv import GetModelState  
+import numpy as np
+
 from nav_msgs.msg import Odometry
 from ngeeann_av_nav.msg import State2D
 from tf.transformations import quaternion_from_euler
@@ -12,15 +12,14 @@ class Localisation:
 
     def __init__(self):
 
-        rospy.init_node('odom_to_state2D')
-
-        # Initialize subscriber
-        rospy.Subscriber("/camera/odom/sample", Odometry, self.pose_cb)
-
-        # Initialise publishers
+        # Initialise Publishers
         self.localisation_pub = rospy.Publisher('/state2D', State2D, queue_size=10)
 
+        # Initialise Subscriber
+        rospy.Subscriber("/camera/odom/sample", Odometry, self.pose_cb)
+
     def pose_cb(self, msg):
+
         state = State2D()
 
         # 2D Pose Information
@@ -39,8 +38,21 @@ class Localisation:
 
         self.localisation_pub.publish(state)
 
-    def run(self):
-        rospy.spin()
+def main():
+
+    # Initialise the node
+    rospy.init_node('odom_to_state2D')
+
+    # Initialise the class
+    localisation = Localisation()
+
+    while not rospy.is_shutdown():
+        try:
+            rospy.spin()
+
+        except KeyboardInterrupt:
+            print("Shutting down ROS node...")
+
 
 if __name__ == '__main__':
-	Localisation().run()       
+    main()   
