@@ -3,3 +3,7 @@ path_tracker:
     control_gain: 1.0
     softening_gain: 1.0
     yawrate_gain: 1.0
+
+path_planner: 
+    distance_step: 0.025
+    frame_id: map
