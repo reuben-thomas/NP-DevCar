@@ -9,7 +9,7 @@ from ackermann_msgs.msg import AckermannDrive
 
 class NonLinearBicycleModel():
 
-    def __init__(self, x=0.0, y=0.0, yaw=0.0, vx=0.000001, vy=0.0, omega=0.0):
+    def __init__(self, x=0.0, y=0.0, yaw=0.0, vx=0.0, vy=0.0, omega=0.0):
 
         # Initialise Publishers
         self.odom_pub = rospy.Publisher("/camera/odom/sample", Odometry, queue_size=30)	
@@ -58,36 +58,65 @@ class NonLinearBicycleModel():
         dt = 1 / self.frequency
         Lr = self.L - self.Lf
 
-        '''
-        Cornering stiffness estimated calculation [N/rad]
-        Reference: https://www.mchenrysoftware.com/medit32/readme/msmac/default.htm?turl=examplestirecorneringstiffnesscalculation1.htm
-        '''
-        Cf = self.m * (Lr / self.L) * 0.5 * 0.165 * (180 / np.pi)
-        Cr = self.m * (self.Lf / self.L) * 0.5 * 0.165 * (180 / np.pi)
+        if self.vx < 0.01:
+            rospy.loginfo("Computing with the kinematic bicycle model")
 
-        self.delta = np.clip(self.delta, -self.max_steer, self.max_steer)
-        self.x = self.x + self.vx * np.cos(self.yaw) * dt - self.vy * np.sin(self.yaw) * dt
-        self.y = self.y + self.vx * np.sin(self.yaw) * dt + self.vy * np.cos(self.yaw) * dt
-        self.yaw = self.yaw + self.omega * dt
-        self.yaw = self.normalise_angle(self.yaw)
-        
-        # Calculate front and rear slip angles
-        af = np.arctan2((self.vy + self.Lf * self.omega / self.vx) - (self.delta), 1.0)
-        ar = np.arctan2((self.vy - Lr * self.omega / self.vx), 1.0)
+            # Compute radius and angular velocity of the kinematic bicycle model
+            if self.yaw == 0:
+                self. omega = 0
+            
+            else:
+                R = self.L / np.sin(self.yaw)
+                self.vx = self.vx + self.throttle
+                self.omega = self.vx / R
 
-        # Calculate front and rear lateral forces
-        Ffy = -Cf * af
-        Fry = -Cr * ar
+            # Compute the state change rate
+            self.vx = self.vx + self.throttle
+            x_dot = self.vx * np.cos(self.yaw)
+            y_dot = self.vx * np.sin(self.yaw)
 
-        # Calculate the total frictional force
-        R_x = self.c_k * self.vx
-        F_aero = self.c_d * self.vx ** 2
-        F_load = F_aero + R_x
+            # Compute the final state using the discrete time model
+            self.x = self.x + x_dot * dt
+            self.y = self.y + y_dot * dt
+            self.yaw = self.yaw + self.delta + self.omega * dt
+            self.yaw = self.normalise_angle(self.yaw)
 
-        # Calculate the velocity components and angular velocity
-        self.vx = self.vx + (self.throttle - Ffy * np.sin(self.delta) / self.m - F_load/self.m + self.vy * self.omega) * dt
-        self.vy = self.vy + (Fry / self.m + Ffy * np.cos(self.delta) / self.m - self.vx * self.omega) * dt
-        self.omega = self.omega + (Ffy * self.Lf * np.cos(self.delta) - Fry * Lr) / self.Iz * dt
+        else:
+            rospy.loginfo("Computing with the dynamic bicycle model")
+            '''
+            Cornering stiffness estimated calculation [N/rad]
+            Reference: https://www.mchenrysoftware.com/medit32/readme/msmac/default.htm?turl=examplestirecorneringstiffnesscalculation1.htm
+            '''
+            Cf = self.m * (Lr / self.L) * 0.5 * 0.165 * (180 / np.pi)
+            Cr = self.m * (self.Lf / self.L) * 0.5 * 0.165 * (180 / np.pi)
+
+            self.delta = np.clip(self.delta, -self.max_steer, self.max_steer)
+            self.x = self.x + self.vx * np.cos(self.yaw) * dt - self.vy * np.sin(self.yaw) * dt
+            self.y = self.y + self.vx * np.sin(self.yaw) * dt + self.vy * np.cos(self.yaw) * dt
+            self.yaw = self.yaw + self.omega * dt
+            self.yaw = self.normalise_angle(self.yaw)
+            
+            # Calculate front and rear slip angles
+            af = np.arctan2((self.vy + self.Lf * self.omega / self.vx) - (self.delta), 1.0)
+            ar = np.arctan2((self.vy - Lr * self.omega / self.vx), 1.0)
+
+            # Calculate front and rear lateral forces
+            Ffy = -Cf * af
+            Fry = -Cr * ar
+
+            # Calculate the total frictional force
+            R_x = self.c_k * self.vx
+            F_aero = self.c_d * self.vx ** 2
+            F_load = F_aero + R_x
+
+            # Calculate the velocity components and angular velocity
+            try:
+                self.vx = self.vx + (self.throttle - Ffy * np.sin(self.delta) / self.m - F_load / self.m + self.vy * self.omega) * dt
+                self.vy = self.vy + (Fry / self.m + Ffy * np.cos(self.delta) / self.m - self.vx * self.omega) * dt
+                self.omega = self.omega + (Ffy * self.Lf * np.cos(self.delta) - Fry * Lr) / self.Iz * dt
+
+            except:
+                raise Exception("Mass of the vehicle cannot be zero. Vehicle must exist physically.")
 
     def pub_odom(self):
 
@@ -143,7 +172,6 @@ def main():
 
     # Initialise the class
     bicycle_model = NonLinearBicycleModel()
-    print("Initialized vehicle simulation with dynamic bicycle model")
 
     # Set update rate
     r = rospy.Rate(bicycle_model.frequency)
