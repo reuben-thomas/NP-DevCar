@@ -7,6 +7,7 @@ from ngeeann_av_nav.msg import State2D, Path2D
 from ackermann_msgs.msg import AckermannDrive
 from geometry_msgs.msg import Pose2D, PoseStamped, Quaternion
 from std_msgs.msg import Float32
+from utils.normalise_angle import normalise_angle
 
 class PathTracker:
 
@@ -106,7 +107,7 @@ class PathTracker:
         print('Crosstrack Error : {}'.format(self.crosstrack_error))
 
         # Heading error
-        self.heading_error = self.normalise_angle(self.cyaw[target_idx] - self.yaw)
+        self.heading_error = normalise_angle(self.cyaw[target_idx] - self.yaw)
         self.target_idx = target_idx
         print('Heading Error    : {}'.format(self.heading_error))
 
@@ -170,7 +171,7 @@ class PathTracker:
 
         self.lock.acquire()
         crosstrack_term = np.arctan2((self.k * self.crosstrack_error), (self.ksoft + self.target_vel))
-        heading_term = self.normalise_angle(self.heading_error)
+        heading_term = normalise_angle(self.heading_error)
         yawrate_term = 0.0
         # yawrate_term = -self.kyaw * self.yawrate_error
         
@@ -184,20 +185,7 @@ class PathTracker:
             sigma_t = -self.max_steer
 
         self.set_vehicle_command(self.target_vel, sigma_t)
-        self.lock.release()
-
-    # Normalises angle to -pi to pi
-    def normalise_angle(self, angle):
-
-        while angle > np.pi:
-            angle -= 2 * np.pi
-
-        while angle < -np.pi:
-            angle += 2 * np.pi
-
-        return angle
-
-        self.lock.release()
+        self.lock.release() 
 
     # Publishes to vehicle state
     def set_vehicle_command(self, velocity, steering_angle):

@@ -6,6 +6,7 @@ import numpy as np
 
 from nav_msgs.msg import Odometry
 from ackermann_msgs.msg import AckermannDrive
+from utils.normalise_angle import normalise_angle
 
 class NonLinearBicycleModel():
 
@@ -86,7 +87,7 @@ class NonLinearBicycleModel():
         self.x += self.x_dot * self.dt
         self.y += self.y_dot * self.dt
         self.yaw += self.omega * self.dt
-        self.yaw = self.normalise_angle(self.yaw)
+        self.yaw = normalise_angle(self.yaw)
 
     def nonlinear_model(self):
 
@@ -102,7 +103,7 @@ class NonLinearBicycleModel():
         self.x = self.x + self.vx * np.cos(self.yaw) * self.dt - self.vy * np.sin(self.yaw) * self.dt
         self.y = self.y + self.vx * np.sin(self.yaw) * self.dt + self.vy * np.cos(self.yaw) * self.dt
         self.yaw = self.yaw + self.omega * self.dt
-        self.yaw = self.normalise_angle(self.yaw)
+        self.yaw = normalise_angle(self.yaw)
         
         # Calculate front and rear slip angles
         af = np.arctan2((self.vy + self.Lf * self.omega / self.vx) - (self.delta), 1.0)
@@ -170,20 +171,6 @@ class NonLinearBicycleModel():
 
         quaternion = tf.transformations.quaternion_from_euler(0, 0, self.yaw)
         self.pose_broadcaster.sendTransform((self.x, self.y, 0.0), quaternion, rospy.Time.now(), "camera_link", "map")
-
-    def normalise_angle(self, angle):
-        """
-        Normalize an angle to [-pi, pi].
-        :param angle: (float)
-        :return: (float) Angle in radian in [-pi, pi]
-        """
-        while angle > np.pi:
-            angle -= 2.0 * np.pi
-
-        while angle < -np.pi:
-            angle += 2.0 * np.pi
-
-        return angle
 
 def main():
 
