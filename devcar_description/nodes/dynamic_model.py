@@ -61,16 +61,8 @@ class NonLinearBicycleModel():
 
         rospy.loginfo("Computing with the kinematic bicycle model")
 
-        # Compute radius and angular velocity of the kinematic bicycle model
-        if self.yaw == 0.0:
-            self.omega = 0.0
-        
-        else:
-            R = self.L / np.tan(self.delta)
-            self.omega = self.vx / R
-
         # Compute the state change rate
-        self.vx += self.throttle
+        self.vx += self.throttle * self.dt
         self.delta = np.clip(self.delta, -self.max_steer, self.max_steer)
         x_dot = self.vx * np.cos(self.yaw)
         y_dot = self.vx * np.sin(self.yaw)
@@ -78,6 +70,14 @@ class NonLinearBicycleModel():
         # Compute the final state using the discrete time model
         self.x += x_dot * self.dt
         self.y += y_dot * self.dt
+
+        # Compute radius and angular velocity of the kinematic bicycle model
+        if self.delta == 0.0:
+            self.omega = 0.0
+        else:
+            R = self.L / np.tan(self.delta)
+            self.omega = self.vx / R
+        
         self.yaw += self.omega * self.dt
         self.yaw = self.normalise_angle(self.yaw)
 
