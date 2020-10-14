@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
 import rospy
-import numpy as np
 import tf
-import math
 import geometry_msgs.msg
+import numpy as np
 
-from devcar_nav.msg import Path2D, State2D
+from devcar_nav.msg import Path2D
 from nav_msgs.msg import Path, Odometry
 from geometry_msgs.msg import Point, Pose2D, PoseStamped
 from visualization_msgs.msg import Marker
