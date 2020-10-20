@@ -12,9 +12,9 @@ class QuinticPolynomial:
         self.a_2 = init_accel / 2.0
 
         # Solve the linear equation (Ax = B)
-        A = np.array([dist ** 3, dist ** 4, dist ** 5], 
-                     [3 * dist ** 2, 4 * dist ** 3, 5 * dist ** 4],
-                     [6 * dist, 12 * dist ** 2, 20 * dist ** 3])
+        A = np.array([dist ** 3,       dist ** 4,        dist ** 5], 
+                     [3 * dist ** 2,   4 * dist ** 3,    5 * dist ** 4],
+                     [6 * dist,        12 * dist ** 2,   20 * dist ** 3])
 
         B = np.array([final_pos - self.a_0 - self.a_1 * dist - self.a_2 * dist ** 2, final_vel - self.a_1 - init_accel * dist, final_accel - init_accel])
 
@@ -50,10 +50,14 @@ class QuinticPolynomial:
 
 class CubicPolynomial:
 
-    def __init__(self):
-        pass
+    def __init__(self, init_pos, init_vel, init_accel):
+        
+        # Derived coefficients
+        self.d = init_pos
+        self.c = init_vel
+        self.b = init_accel / 2.0
 
-def quintic_polynomial_planner(x_i, y_i, yaw_i, v_i, a_i, x_f, y_f, yaw_f, v_f, a_f):
+def quintic_polynomial_planner(x_i, y_i, yaw_i, v_i, a_i=0.0, x_f, y_f, yaw_f, v_f, a_f=0.0, ds):
     
     # Calculate the velocity boundary conditions based on vehicle's orientation
     v_xi = v_i * np.cos(yaw_i)
@@ -67,7 +71,52 @@ def quintic_polynomial_planner(x_i, y_i, yaw_i, v_i, a_i, x_f, y_f, yaw_f, v_f, 
     a_yi = a_i * np.sin(yaw_i)
     a_yf = a_f * np.sin(yaw_f)
 
-    for S
+    for S in np.arange(0.0, 100.0, 5.0):
+        # Initialise the class
+        xqp = QuinticPolynomial(x_i, v_xi, a_xi, x_f, v_xf, a_xf, S)
+        yqp = QuinticPolynomial(y_i, v_yi, a_yi, y_f, v_yf, a_yf, S)
+
+        # Clear the arrays
+        x = []
+        y = []
+        v = []
+        a = []
+        j = []
+        yaw = []
+
+        for s in np.arange(0.0, S + ds, ds):
+            # Solve for position
+            x.append(xqp.calc_point(s))
+            y.append(yqp.calc_point(s))
+
+            # Solve for velocity
+            v_x = xqp.calc_first_derivative(s)
+            v_y = yqp.calc_first_derivative(s)
+            v.append(np.hypot(v_x, v_y))
+
+            # Solve for orientation
+            yaw.append(np.arctan2(vy, vx))
+
+            # Solve for acceleration
+            a_x = xqp.calc_second_derivative(s)
+            a_y = yqp.calc_second_derivative(s)
+
+            if len(v) >= 2 and v[-1] - v[-2] < 0.0:
+                a.append(-1.0 * np.hypot(a_x, a_y))
+
+            else:
+                a.append(np.hypot(a_x, a_y))
+        
+            # Solve for jerk
+            j_x = xqp.calc_third_derivative(s)
+            j_y = yqp.calc_third_derivative(s)
+            
+            if len(a) >= 2 and a[-1] - a[-2] < 0.0:
+                j.append(-1 * np.hypot(j_x, j_y))
+
+            else:
+                j.append(np.hypot(j_x, j_y))
+
 
 def cubic_polynomial_planner():
     pass
