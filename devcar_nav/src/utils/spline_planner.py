@@ -73,10 +73,10 @@ def quintic_polynomial_planner(x_i, y_i, yaw_i, v_i, a_i=0.0, x_f, y_f, yaw_f, v
 
     for S in np.arange(0.0, 100.0, 5.0):
         # Initialise the class
-        xqp = QuinticPolynomial(x_i, v_xi, a_xi, x_f, v_xf, a_xf, S)
+        xqp = QuinticPolynomial(x_i, v_xi, a_xi, x_f, v_xf, a_xf, max_accel, max_jerk, S)
         yqp = QuinticPolynomial(y_i, v_yi, a_yi, y_f, v_yf, a_yf, S)
 
-        # Clear the arrays
+        # Instantiate/clear the arrays
         x = []
         y = []
         v = []
@@ -117,6 +117,10 @@ def quintic_polynomial_planner(x_i, y_i, yaw_i, v_i, a_i=0.0, x_f, y_f, yaw_f, v
             else:
                 j.append(np.hypot(j_x, j_y))
 
+        if max([abs(i) for i in a]) <= max_accel and max([abs(i) for i in j]) <= max_jerk:
+            break
+
+    return x, y, v, a, j, yaw
 
 def cubic_polynomial_planner():
     pass
