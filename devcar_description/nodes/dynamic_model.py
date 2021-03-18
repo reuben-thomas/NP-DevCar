@@ -7,8 +7,9 @@ import numpy as np
 from nav_msgs.msg import Odometry
 from ackermann_msgs.msg import AckermannDrive
 from utils.normalise_angle import normalise_angle
+from utils.kinetmatic_model import KinematicBicycleModel
 
-class NonLinearBicycleModel():
+class BicycleModel():
 
     def __init__(self, x=0.0, y=0.0, yaw=0.0, vx=0.0, vy=0.0, omega=0.0):
 
@@ -65,29 +66,8 @@ class NonLinearBicycleModel():
 
         rospy.loginfo("Computing with the kinematic bicycle model")
 
-        # Compute the local velocity in the x-axis
-        f_load = self.vx * (self.c_r + self.c_a * self.vx)
-        self.vx += self.dt * (self.throttle - f_load)
-
-        # Compute radius and angular velocity of the kinematic bicycle model
-        self.delta = np.clip(self.delta, -self.max_steer, self.max_steer)
-
-        if self.delta == 0.0:
-            self.omega = 0.0
-
-        else:
-            R = self.L / np.tan(self.delta)
-            self.omega = self.vx / R
-
-        # Compute the state change rate
-        self.x_dot = self.vx * np.cos(self.yaw)
-        self.y_dot = self.vx * np.sin(self.yaw)
-
-        # Compute the final state using the discrete time model
-        self.x += self.x_dot * self.dt
-        self.y += self.y_dot * self.dt
-        self.yaw += self.omega * self.dt
-        self.yaw = normalise_angle(self.yaw)
+        kbm = KinematicBicycleModel(self.x, self.y, self.yaw, self.vx, self.throttle, self.delta, self.L, self.max_steer, self.dt, self.c_r, self.c_a)
+        self.x, self.y, self.yaw, self.vx, self.delta, self.omega = kbm.kinematic_model()
 
     def nonlinear_model(self):
 
@@ -178,7 +158,7 @@ def main():
     rospy.init_node('dynamic_model')
 
     # Initialise the class
-    bicycle_model = NonLinearBicycleModel()
+    bicycle_model = BicycleModel()
 
     # Set update rate
     r = rospy.Rate(bicycle_model.frequency)
