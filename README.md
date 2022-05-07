@@ -1,10 +1,13 @@
 # ELECTRIC POWERED 1/10 AUTONOMOUS CAR
+
 ![DevCar](https://github.com/reuben-thomas/NP-DevCar/blob/master/screenshots/DevCar.png)
 
 ## Abstract
+
 This project covers the development of an autonomous electric car at a 1:10 scale. The car will use vision and LiDAR information to follow a track at high-speeds.
 
 ## Table of Contents
+
 - [Requirements](#Requirements)
   - [Hardware](#Hardware)
   - [Operating System](#Operating-System)
@@ -17,7 +20,9 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 - [Credits](#Credits)
 
 ## Requirements
+
 ### Hardware
+
 1. Electric Powered 1/10 RC Car
 2. [Hokuyo UST-10LX](https://www.hokuyo-usa.com/products/lidar-obstacle-detection/ust-10lx)
 3. [NVIDIA® Jetson™ TX2](https://developer.nvidia.com/embedded/jetson-tx2-developer-kit)
@@ -26,11 +31,13 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 6. [Intel® RealSense™ Tracking Camera T265](https://www.intelrealsense.com/tracking-camera-t265/)
 
 ### Operating System
+
 1. [Ubuntu 16.04.6 LTS (Xenial Xerus)](http://releases.ubuntu.com/16.04/)
 2. [JetPack 3.3](https://developer.nvidia.com/embedded/jetpack-3_3)
 3. [Orbitty L4T R28.2X BSP](https://connecttech.com/ftp/Drivers/CTI-L4T-V121.tgz)
 
 ### Software
+
 1. [Desktop-Full ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu)
 2. [Python 2.7](https://www.python.org/download/releases/2.7/)
    - [pip](https://pypi.org/project/pip/)
@@ -40,6 +47,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 4. [Arduino IDE](https://www.arduino.cc/download_handler.php)
 
 ## Installation
+
 ### Installation on Host Computer
 1. Install [Ubuntu 16.04.6 LTS (Xenial Xerus)](http://releases.ubuntu.com/16.04/)
 2. Install [JetPack 3.3](https://developer.nvidia.com/embedded/jetpack-3_3)
@@ -47,6 +55,7 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 4. Install [Arduino IDE](https://www.arduino.cc/download_handler.php)
 
 ### Flashing the Jetson TX2
+
 1. Connect your host computer to the Jetson TX2 via Micro-USB
 
 2. Go through the full initial JetPack 3.3 installation
@@ -93,20 +102,20 @@ This project covers the development of an autonomous electric car at a 1:10 scal
 14. Enter the IP address of your Jetson TX2 system, as well as the username and password
 
 ### Installation on Jetson TX2
+
 1. Install [Desktop-Full ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu)
-   - Type `chmod +x ros-kinetic-desktop-full-install.sh`
-   - Type `./ros-kinetic-desktop-full-install.sh` to install Desktop-Full ROS Kinetic
+   - Type `sh ros-kinetic-desktop-full-install.sh` to install Desktop-Full ROS Kinetic
    
 2. Git clone this repository
    - Open your terminal
    - Go to the directory you wish to clone the repository in
-   - Type `https://github.com/reuben-thomas/NP-DevCar.git`
+   - Type `git clone https://github.com/reuben-thomas/NP-DevCar.git`
    
 3. Install the required packages
-   - Type `chmod +x requirements.sh`
-   - Type `./requirements.sh`
+   - Type `sh requirements.sh`
    
 ## Testing Steering and Throttle
+
 1. Open the Arduino IDE on the host computer
 
 2. Configure the correct board and port on the IDE
@@ -126,4 +135,5 @@ This project covers the development of an autonomous electric car at a 1:10 scal
    - Type `rostopic pub car/cmd_vel geometry_msgs/Twist '{linear: {x: <value>}, angular: {z: <angle>}}'`
 
 ## Credits
+
 Photographer - [Elgin Ng](https://www.instagram.com/elginjh_/)
